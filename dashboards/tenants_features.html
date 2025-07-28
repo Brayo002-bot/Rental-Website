@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakaziPAY Kenya - Tenant Features</title>
+    <link rel="stylesheet" href="../frontend/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    </head>
+<body>
+    <style>
+        /* General Body & Container Styles */
+body {
+    font-family: 'Arial', sans-serif; /* Or your preferred font-family */
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* Light background consistent with landlord features */
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px; /* Add horizontal padding for smaller screens */
+}
+
+/* Header/Navigation Styles (should be consistent across all pages) */
+/* It's highly recommended to put these header styles in a main.css file
+   and link that file on all your pages for consistency. */
+header {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+header nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+header nav .logo {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #333;
+}
+
+header nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+header nav ul li {
+    margin-left: 30px;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+header nav ul li a:hover {
+    color: #007bff;
+}
+
+.nav-buttons .btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 10px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-buttons .btn-login {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.nav-buttons .btn-login:hover {
+    background-color: #218838;
+}
+
+.nav-buttons .btn-signup {
+    background-color: #007bff; /* Blue */
+    color: white;
+}
+
+.nav-buttons .btn-signup:hover {
+    background-color: #0056b3;
+}
+
+
+/* Hero Section Styles for Tenant Page */
+.tenant-features-hero { /* Specific class for tenant hero */
+    text-align: center;
+    padding: 80px 20px;
+    background-color: #e6f7ff; /* A lighter, more 'airy' blue tint for tenants */
+    border-bottom: 1px solid #dcdcdc;
+    margin-bottom: 40px;
+}
+
+.tenant-features-hero h1 {
+    font-size: 3em;
+    color: #007bff; /* Blue for main tenant heading */
+    margin-bottom: 15px;
+}
+
+.tenant-features-hero p {
+    font-size: 1.1em;
+    max-width: 800px;
+    margin: 0 auto;
+    color: #555;
+}
+
+/* Features Grid Section (largely consistent with landlord features) */
+.features-grid {
+    padding: 40px 0;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-category {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    margin-bottom: 40px;
+    padding: 30px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.feature-category:hover {
+    transform: translateY(-5px);
+}
+
+.feature-category h2 {
+    font-size: 2.2em;
+    color: #007bff; /* Blue for tenant category headings */
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.feature-category h2 i {
+    margin-right: 15px;
+    font-size: 1.1em;
+    color: #28a745; /* Green for category icons (as a secondary brand color) */
+}
+
+.feature-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.feature-item-detail {
+    background-color: #f9f9f9;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item-detail:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.feature-item-detail i {
+    color: #007bff; /* Blue check circle icon for tenant features */
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.feature-item-detail h3 {
+    font-size: 1.4em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.feature-item-detail p {
+    font-size: 1em;
+    color: #666;
+}
+
+/* Call to Action Section (slightly adapted for tenant focus) */
+.call-to-action {
+    text-align: center;
+    background-color: #28a745; /* Green background for CTA (consistent with landlord signup) */
+    color: white;
+    padding: 60px 20px;
+    margin-top: 50px;
+    border-radius: 8px;
+}
+
+.call-to-action h2 {
+    font-size: 2.5em;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.call-to-action p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.call-to-action .btn {
+    padding: 15px 30px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin: 0 10px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.call-to-action .btn-signup {
+    background-color: #007bff; /* Blue button for tenant signup */
+    color: white;
+}
+
+.call-to-action .btn-signup:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.call-to-action .btn-contact { /* Re-using btn-contact for "Login to Your Portal" */
+    background-color: #6c757d; /* Grey button */
+    color: white;
+}
+
+.call-to-action .btn-contact:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+/* Footer Styles (should be consistent across all pages) */
+footer {
+    text-align: center;
+    padding: 30px 20px;
+    margin-top: 50px;
+    background-color: #333;
+    color: #eee;
+    font-size: 0.9em;
+}
+
+/* Responsive Design (consistent with landlord features, adjust as needed) */
+@media (max-width: 1024px) {
+    .tenant-features-hero h1 {
+        font-size: 2.5em;
+    }
+    .feature-category h2 {
+        font-size: 2em;
+    }
+    .feature-list {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Navigation responsive styles - ensure these are in your shared CSS */
+    header nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px;
+    }
+    header nav .logo {
+        margin-bottom: 15px;
+    }
+    header nav ul {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+        align-items: flex-start;
+    }
+    header nav ul li {
+        margin: 8px 0;
+    }
+    .nav-buttons {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+    }
+    .nav-buttons .btn {
+        flex: 1;
+        margin: 0 5px;
+        text-align: center;
+    }
+
+    .tenant-features-hero {
+        padding: 60px 20px;
+    }
+    .tenant-features-hero h1 {
+        font-size: 2em;
+    }
+    .tenant-features-hero p {
+        font-size: 1em;
+    }
+
+    .features-grid {
+        padding: 20px;
+    }
+
+    .feature-category {
+        padding: 20px;
+    }
+    .feature-category h2 {
+        font-size: 1.8em;
+        flex-direction: column;
+        text-align: center;
+    }
+    .feature-category h2 i {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .feature-list {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .feature-item-detail {
+        padding: 20px;
+    }
+    .feature-item-detail h3 {
+        font-size: 1.2em;
+    }
+
+    .call-to-action h2 {
+        font-size: 2em;
+    }
+    .call-to-action p {
+        font-size: 1em;
+    }
+    .call-to-action .btn {
+        display: block;
+        width: calc(100% - 20px);
+        margin: 10px auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-buttons .btn {
+        font-size: 0.9em;
+        padding: 8px 15px;
+    }
+    .tenant-features-hero h1 {
+        font-size: 1.8em;
+    }
+    .feature-category h2 {
+        font-size: 1.6em;
+    }
+    .feature-item-detail i {
+        font-size: 1.5em;
+    }
+    .call-to-action h2 {
+        font-size: 1.8em;
+    }
+}
+    </style>
+
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="../frontend2/features.html">MakaziPAY Kenya</a>
+            </div>
+            <ul>
+                <li><a href="../frontend2/how-it-works.html">How It Works</a></li>
+                <li><a href="../frontend2/about.html">About Us</a></li>
+                <li><a href="../frontend2/contact.html">Contact</a></li>
+            </ul>
+            <div class="nav-buttons">
+                <a href="../frontend/login.html" class="btn btn-login">Login</a>
+                <a href="../frontend/signup.html" class="btn btn-signup">Sign Up</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="tenant-features-hero">
+            <h1>Effortless Living with MakaziPAY Kenya</h1>
+            <p>MakaziPAY Kenya simplifies your rental journey, providing easy access to essential tools and information at your fingertips.</p>
+        </section>
+
+        <section class="features-grid">
+            <div class="feature-category">
+                <h2><i class="fas fa-desktop"></i> Your Personalized Tenant Portal</h2>
+                <div class="feature-list">
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Secure Account Access</h3>
+                        <p>Log in to your private portal from any device to manage your rental details securely and conveniently.</p>
+                    </div>
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Instant Communication with Landlord</h3>
+                        <p>Send direct messages and receive important updates, announcements, and notifications from your landlord or property manager.</p>
+                    </div>
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Access to Lease & Documents</h3>
+                        <p>View your lease agreement, addendums, and other important rental documents anytime, without needing to contact your landlord.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-category">
+                <h2><i class="fas fa-money-check-alt"></i> Easy Payments & Financial Overview</h2>
+                <div class="feature-list">
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Convenient Online Rent Payments</h3>
+                        <p>Pay your rent securely online using various payment methods, eliminating the need for checks or physical visits.</p>
+                    </div>
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Payment History & Receipts</h3>
+                        <p>Keep track of all your past payments and access digital receipts for your records whenever you need them.</p>
+                    </div>
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Automated Rent Reminders</h3>
+                        <p>Receive timely reminders before your rent is due, ensuring you never miss a payment and avoid late fees.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-category">
+                <h2><i class="fas fa-tools"></i> Hassle-Free Maintenance & Support</h2>
+                <div class="feature-list">
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Easy Maintenance Request Submission</h3>
+                        <p>Submit maintenance or repair requests directly through your portal, including descriptions and photos, for quick resolution.</p>
+                    </div>
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Real-time Request Tracking</h3>
+                        <p>Monitor the status of your submitted maintenance requests from submission to completion, staying informed every step of the way.</p>
+                    </div>
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Access to FAQs & Resources</h3>
+                        <p>Find answers to common questions about your rental, property rules, and helpful resources within the portal.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-category">
+                <h2><i class="fas fa-hand-holding-heart"></i> Convenience & Community</h2>
+                <div class="feature-list">
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Profile Management</h3>
+                        <p>Easily update your contact information and personal details within your secure tenant profile.</p>
+                    </div>
+                    <div class="feature-item-detail">
+                        <i class="fas fa-check-circle"></i>
+                        <h3>Notifications & Alerts</h3>
+                        <p>Stay informed with automatic alerts about important property news, community events, or any changes that affect your tenancy.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="call-to-action">
+            <h2>Ready for a Smoother Rental Experience?</h2>
+            <p>Join MakaziPAY Kenya today and enjoy convenience at your fingertips.</p>
+            <a href="../frontend/signup.html" class="btn btn-signup">Sign Up for Free</a>
+            <a href="../frontend/login.html" class="btn btn-contact">Login to Your Portal</a>
+        </section>
+    </main>
+
+     <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section about-us">
+                    <h3>About MakaziPAY Kenya</h3>
+                    <p>Your trusted partner for automated rental management, making life easier for landlords and tenants.</p>
+                </div>
+                <div class="footer-section quick-links">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="../frontend2/features.html">Features</a></li>
+                        <li><a href="../frontend2/how-it-works.html">How It Works</a></li>
+                        <li><a href="../frontend2/about.html">About Us</a></li>
+                        <li><a href="../frontend2/contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section contact-info">
+                    <h3>Contact Us</h3>
+                    <p><i class="fas fa-envelope"></i> info@makazipaykenya.com</p>
+                    <p><i class="fas fa-phone"></i> +254 714 300 672</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-telegram-plane"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 MakaziPAY Kenya. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../frontend/script.js"></script>
+</body>
+</html>
