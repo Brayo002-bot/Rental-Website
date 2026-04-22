@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - MakaziPAY Kenya{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">Join MakaziPAY Kenya Today</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" name="fullName" 
+                       placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" 
+                       placeholder="Enter your email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number (Optional)</label>
+                <input type="tel" id="phone" name="phone" 
+                       placeholder="Enter your phone number">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" 
+                       placeholder="Create a password (min 6 characters)" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password *</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" 
+                       placeholder="Confirm your password" required>
+            </div>
+
+            <div class="form-group radio-group">
+                <p><strong>Register as: *</strong></p>
+                <div style="display: flex; gap: 20px;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="radio" id="landlord" name="role" value="landlord" required>
+                        <span>Landlord</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="radio" id="tenant" name="role" value="tenant" required>
+                        <span>Tenant</span>
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-secondary btn-full-width">
+                Create Account
+            </button>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Log in here</a>
+        </p>
+    </div>
+</div>
+
+<style>
+    .radio-group {
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        margin: 15px 0;
+    }
+
+    .radio-group p {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    .radio-group label {
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .radio-group input[type="radio"] {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

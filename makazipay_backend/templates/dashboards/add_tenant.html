@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-8 mt-10">
+    <h1 class="text-2xl font-bold mb-6 text-gray-800">
+        {% if tenant %}Edit Tenant Link{% else %}Link Tenant to Apartment{% endif %}
+    </h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-4">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="{% if tenant %}{% url 'edit_tenant' tenant.id %}{% else %}{% url 'add_tenant' %}{% endif %}" class="space-y-4">
+        {% csrf_token %}
+
+        <div class="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
+            <p class="text-sm text-blue-800">
+                <strong>ℹ️ Important:</strong> The tenant must have registered first. 
+                <a href="{% url 'signup' %}" class="underline font-bold" target="_blank">
+                    Direct them to register here (choose Tenant role)
+                </a>
+            </p>
+        </div>
+
+        <div>
+            <label for="email" class="block text-gray-700 font-medium">Tenant Email *</label>
+            <input type="email" id="email" name="email" {% if tenant %}readonly{% endif %}
+                   value="{{ tenant.user.email|default_if_none:'' }}"
+                   class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   placeholder="tenant@example.com" {% if not tenant %}required{% endif %}>
+            <p class="text-sm text-gray-500 mt-1">Enter the exact email the tenant used to register.</p>
+        </div>
+
+        <div>
+            <label for="property" class="block text-gray-700 font-medium">Property *</label>
+            <select id="property" name="property" required
+                   class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="">-- Select Property --</option>
+                {% for property in properties %}
+                    <option value="{{ property.id }}" {% if tenant and property.id == tenant.property.id %}selected{% endif %}>
+                        {{ property.name }} ({{ property.address }})
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="unit" class="block text-gray-700 font-medium">Unit/Apartment Number *</label>
+            <input type="text" id="unit" name="unit" required
+                   value="{{ tenant.unit|default_if_none:'' }}"
+                   class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   placeholder="e.g., 101, A1, Apt-5">
+        </div>
+
+        <div>
+            <label for="rent" class="block text-gray-700 font-medium">Monthly Rent Amount (KES) *</label>
+            <input type="number" id="rent" name="rent" min="0.01" step="0.01" required
+                   value="{{ tenant.rent|default_if_none:'' }}"
+                   class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                   placeholder="e.g., 15000">
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit"
+                    class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200 flex-1">
+                {% if tenant %}Update Tenant{% else %}Link Tenant{% endif %}
+            </button>
+            <a href="{% url 'landlord_dashboard' %}"
+               class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500 transition duration-200 flex-1 text-center">
+                Cancel
+            </a>
+        </div>
+    </form>
+
+    {% if tenant %}
+        <form method="POST" action="{% url 'remove_tenant' tenant.id %}" class="mt-4">
+            {% csrf_token %}
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition duration-200">
+                Delete Tenant Link
+            </button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}

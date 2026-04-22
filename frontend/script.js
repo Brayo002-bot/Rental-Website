@@ -140,7 +140,7 @@ if (signupForm) {
 
         // 4. Send data to backend using Fetch API
         try {
-            const response = await fetch('http://localhost:5000/api/auth/signup', {
+            const response = await fetch('/api/auth/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -159,20 +159,15 @@ if (signupForm) {
                 alert(data.message); // Show success message from backend
                 signupForm.reset(); // Clear the form fields
 
-                // --- NEW REDIRECTION LOGIC ---
-                // This is the correct relative path for dashboards if they are in a 'dashboards' folder
-                // that is a sibling to the 'frontend' folder, and your signup.html is in 'frontend'.
-                // If signup.html is directly in the root of your project, and dashboards are in
-                // 'dashboards/', then you'd use './dashboards/landlord.html'.
-                if (data.role === 'Landlord') {
-                    window.location.href = '../dashboards/landlord.html';
-                } else if (data.role === 'Tenant') {
-                    window.location.href = '../dashboards/tenant.html';
+                // Redirect to the Django dashboard endpoints instead of static HTML.
+                if (data.role === 'landlord') {
+                    window.location.href = '/dashboards/landlord/';
+                } else if (data.role === 'tenant') {
+                    window.location.href = '/dashboards/tenant/';
                 } else {
                     // Fallback if role is unexpected or missing (though it shouldn't be with current backend)
-                    window.location.href = 'login.html'; // Redirect to login or a generic success page
+                    window.location.href = '/login/';
                 }
-                // --- END NEW REDIRECTION LOGIC ---
 
             } else {
                 // Handle errors from the backend (e.g., 400 Bad Request, 409 Conflict)

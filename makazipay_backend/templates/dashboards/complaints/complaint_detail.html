@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Complaint Details - MakaziPAY Kenya{% endblock %}
+
+{% block content %}
+<main class="dashboard-main-content">
+    <div class="dashboard-top-row" style="display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+        {% if user.role == 'tenant' %}
+            <a href="{% url 'tenant_complaints' %}" class="btn btn-secondary">← Back to Complaints</a>
+        {% elif user.role == 'landlord' %}
+            <a href="{% url 'landlord_complaints' %}" class="btn btn-secondary">← Back to Complaints</a>
+        {% endif %}
+        <h2>Complaint Details</h2>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-4">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="complaint-detail-container" style="max-width:900px;">
+        <!-- Header -->
+        <section class="dashboard-section">
+            <div style="display:flex; justify-content:space-between; align-items:start; gap:16px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:300px;">
+                    <h3>{{ complaint.title }}</h3>
+                    <p style="color:#6b7280; margin-top:4px;">
+                        Property: {{ complaint.tenant.property.name }} - Unit {{ complaint.tenant.unit }}
+                    </p>
+                    <p style="color:#6b7280;">
+                        Tenant: {{ complaint.tenant.name }}
+                    </p>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <span style="
+                        padding:6px 12px;
+                        border-radius:6px;
+                        font-size:12px;
+                        font-weight:600;
+                        background-color:{% if complaint.priority == 'urgent' %}#fee2e2{% elif complaint.priority == 'high' %}#fef3c7{% elif complaint.priority == 'medium' %}#dbeafe{% else %}#e0e7ff{% endif %};
+                        color:{% if complaint.priority == 'urgent' %}#991b1b{% elif complaint.priority == 'high' %}#92400e{% elif complaint.priority == 'medium' %}#1e40af{% else %}#3730a3{% endif %};
+                    ">
+                        {{ complaint.get_priority_display }} Priority
+                    </span>
+                    <span style="
+                        padding:6px 12px;
+                        border-radius:6px;
+                        font-size:12px;
+                        font-weight:600;
+                        background-color:{% if complaint.status == 'resolved' or complaint.status == 'closed' %}#d1fae5{% elif complaint.status == 'in_progress' %}#fef3c7{% else %}#fed7aa{% endif %};
+                        color:{% if complaint.status == 'resolved' or complaint.status == 'closed' %}#065f46{% elif complaint.status == 'in_progress' %}#92400e{% else %}#9a3412{% endif %};
+                    ">
+                        {{ complaint.get_status_display }}
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Complaint Details -->
+        <section class="dashboard-section">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+                <div style="padding:12px; background:#f9fafb; border-radius:6px;">
+                    <p style="color:#6b7280; font-size:12px; font-weight:600; margin-bottom:4px;">FILED ON</p>
+                    <p style="font-weight:600;">{{ complaint.created_at|date:"d M Y, H:i" }}</p>
+                </div>
+                <div style="padding:12px; background:#f9fafb; border-radius:6px;">
+                    <p style="color:#6b7280; font-size:12px; font-weight:600; margin-bottom:4px;">LAST UPDATED</p>
+                    <p style="font-weight:600;">{{ complaint.updated_at|date:"d M Y, H:i" }}</p>
+                </div>
+                {% if complaint.responded_at %}
+                    <div style="padding:12px; background:#f9fafb; border-radius:6px;">
+                        <p style="color:#6b7280; font-size:12px; font-weight:600; margin-bottom:4px;">RESPONDED ON</p>
+                        <p style="font-weight:600;">{{ complaint.responded_at|date:"d M Y, H:i" }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div style="padding:16px; background:#f0f9ff; border-left:4px solid #3b82f6; border-radius:6px; margin-bottom:24px;">
+                <p style="color:#1e40af; font-size:13px; margin:0; line-height:1.6;">
+                    <strong>Complaint Description:</strong><br>
+                    {{ complaint.description }}
+                </p>
+            </div>
+
+            <!-- Attachments -->
+            {% if attachments %}
+                <div style="margin-bottom:24px;">
+                    <h4 style="margin-bottom:12px;">📎 Attachments</h4>
+                    <div style="display:grid; gap:8px;">
+                        {% for attachment in attachments %}
+                            <a href="{{ attachment.file.url }}" target="_blank" class="btn btn-sm btn-secondary" style="display:inline-block; padding:8px 12px; text-decoration:none;">
+                                📄 {{ attachment.file.name|truncatewords:3 }} ({{ attachment.uploaded_at|date:"d M Y" }})
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </section>
+
+        <!-- Landlord Response (if exists) -->
+        {% if complaint.landlord_response %}
+            <section class="dashboard-section">
+                <h4>Landlord's Response</h4>
+                <div style="padding:16px; background:#f0fdf4; border-left:4px solid #10b981; border-radius:6px; margin-top:12px;">
+                    <p style="color:#065f46; font-size:13px; margin:0; line-height:1.6;">
+                        {{ complaint.landlord_response }}
+                    </p>
+                    {% if complaint.responded_at %}
+                        <p style="color:#6b7280; font-size:12px; margin-top:12px; margin-bottom:0;">
+                            Responded on {{ complaint.responded_at|date:"d M Y, H:i" }}
+                        </p>
+                    {% endif %}
+                </div>
+            </section>
+        {% endif %}
+
+        <!-- Landlord Response Form -->
+        {% if user.role == 'landlord' and complaint.status != 'closed' %}
+            <section class="dashboard-section">
+                <h4>Respond to Complaint</h4>
+                <form method="POST" class="complaint-response-form" style="margin-top:16px;">
+                    {% csrf_token %}
+
+                    <div class="form-group mb-4">
+                        <label for="id_landlord_response" style="font-weight:600; display:block; margin-bottom:8px;">Your Response <span style="color:red;">*</span></label>
+                        {{ form.landlord_response }}
+                        {% if form.landlord_response.errors %}
+                            <div class="form-error" style="color:red; font-size:12px; margin-top:4px;">
+                                {{ form.landlord_response.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="id_status" style="font-weight:600; display:block; margin-bottom:8px;">Update Status <span style="color:red;">*</span></label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="form-error" style="color:red; font-size:12px; margin-top:4px;">
+                                {{ form.status.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group" style="display:flex; gap:12px;">
+                        <button type="submit" class="btn btn-primary" style="padding:10px 24px;">Send Response</button>
+                        <a href="{% url 'landlord_complaints' %}" class="btn btn-secondary" style="padding:10px 24px;">Cancel</a>
+                    </div>
+                </form>
+            </section>
+        {% elif user.role == 'tenant' and complaint.status == 'closed' %}
+            <div class="alert alert-success">
+                ✅ This complaint has been closed by your landlord.
+            </div>
+        {% endif %}
+    </div>
+</main>
+
+<style>
+    .complaint-response-form textarea,
+    .complaint-response-form select {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .complaint-response-form textarea {
+        font-family: 'Courier New', monospace;
+    }
+
+    .complaint-response-form textarea:focus,
+    .complaint-response-form select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
+{% endblock %}

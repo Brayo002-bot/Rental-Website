@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}File a Complaint - MakaziPAY Kenya{% endblock %}
+
+{% block content %}
+<main class="dashboard-main-content">
+    <div class="dashboard-top-row" style="display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+        <a href="{% url 'tenant_complaints' %}" class="btn btn-secondary">← Back to Complaints</a>
+        <h2>File a New Complaint</h2>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-4">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <section class="dashboard-section" style="max-width:800px;">
+        <form method="POST" enctype="multipart/form-data" class="complaint-form">
+            {% csrf_token %}
+
+            <!-- Select Apartment -->
+            <div class="form-group mb-4">
+                <label for="tenant_id" style="font-weight:600; display:block; margin-bottom:8px;">Select Apartment <span style="color:red;">*</span></label>
+                <select name="tenant_id" id="tenant_id" class="form-control" required>
+                    <option value="">-- Choose an apartment --</option>
+                    {% for tenant in tenants %}
+                        <option value="{{ tenant.id }}">
+                            {{ tenant.property.name }} - Unit {{ tenant.unit }} (Ksh {{ tenant.rent }}/month)
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Title -->
+            <div class="form-group mb-4">
+                <label for="id_title" style="font-weight:600; display:block; margin-bottom:8px;">Complaint Title <span style="color:red;">*</span></label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="form-error" style="color:red; font-size:12px; margin-top:4px;">
+                        {{ form.title.errors }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="form-group mb-4">
+                <label for="id_description" style="font-weight:600; display:block; margin-bottom:8px;">Description <span style="color:red;">*</span></label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <div class="form-error" style="color:red; font-size:12px; margin-top:4px;">
+                        {{ form.description.errors }}
+                    </div>
+                {% endif %}
+                <small style="color:#6b7280; display:block; margin-top:4px;">Provide detailed information about your complaint.</small>
+            </div>
+
+            <!-- Priority -->
+            <div class="form-group mb-4">
+                <label for="id_priority" style="font-weight:600; display:block; margin-bottom:8px;">Priority Level <span style="color:red;">*</span></label>
+                {{ form.priority }}
+                {% if form.priority.errors %}
+                    <div class="form-error" style="color:red; font-size:12px; margin-top:4px;">
+                        {{ form.priority.errors }}
+                    </div>
+                {% endif %}
+                <small style="color:#6b7280; display:block; margin-top:4px;">
+                    <strong>Urgent:</strong> Immediate action required (e.g., no water/electricity)<br>
+                    <strong>High:</strong> Should be addressed soon<br>
+                    <strong>Medium:</strong> Can be handled within a few days<br>
+                    <strong>Low:</strong> General maintenance issue
+                </small>
+            </div>
+
+            <!-- Attachments -->
+            <div class="form-group mb-4">
+                <label for="attachments" style="font-weight:600; display:block; margin-bottom:8px;">Attachments (Optional)</label>
+                <input type="file" id="attachments" name="attachments" multiple class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt">
+                <small style="color:#6b7280; display:block; margin-top:4px;">
+                    Allowed file types: PDF, DOC, DOCX, JPG, PNG, TXT (Max 5 files)
+                </small>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="form-group" style="display:flex; gap:12px;">
+                <button type="submit" class="btn btn-primary" style="padding:10px 24px;">Submit Complaint</button>
+                <a href="{% url 'tenant_complaints' %}" class="btn btn-secondary" style="padding:10px 24px;">Cancel</a>
+            </div>
+        </form>
+    </section>
+</main>
+
+<style>
+    .complaint-form input[type="text"],
+    .complaint-form textarea,
+    .complaint-form select {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .complaint-form textarea {
+        font-family: 'Courier New', monospace;
+    }
+
+    .complaint-form input[type="text"]:focus,
+    .complaint-form textarea:focus,
+    .complaint-form select:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+</style>
+{% endblock %}

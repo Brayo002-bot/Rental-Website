@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Login - MakaziPAY Kenya{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2 class="auth-title">Welcome Back</h2>
+        
+        {% if error %}
+            <div class="alert alert-danger mb-4">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mb-4">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" class="auth-form">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="username">Email Address *</label>
+                <input type="email" id="username" name="username" 
+                       placeholder="Enter your email" required 
+                       value="{{ request.POST.username }}">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password *</label>
+                <input type="password" id="password" name="password" 
+                       placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit" class="btn btn-secondary btn-full-width">
+                Log In
+            </button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
+            <p><a href="#" style="font-size: 0.9em;">Forgot password?</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

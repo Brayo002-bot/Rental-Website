@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block title %}Landlord Dashboard - MakaziPAY Kenya{% endblock %}
+
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block header %}
+<header class="dashboard-header">
+    <div class="dashboard-header-content">
+        <div class="logo">
+            <a href="{% url 'landlord_dashboard' %}">MakaziPAY Kenya</a>
+        </div>
+        
+        <div class="user-info">
+            <span class="user-name">Welcome, {{ user.get_full_name|default:user.username }}!</span>
+            <div class="dropdown">
+                <button class="dropbtn"><i class="fas fa-user-circle"></i></button>
+                <div class="dropdown-content">
+                    <a href="{% url 'landlord_profile' %}">Profile</a>
+                    <a href="#settings">Settings</a>
+                    <a href="{% url 'logout' %}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="sidebar-toggle"><i class="fas fa-bars"></i></button>
+</header>
+{% endblock %}
+
+{% block content %}
+<aside class="dashboard-sidebar">
+    <nav class="sidebar-nav">
+        <ul>
+            <li class="active"><a href="#overview"><i class="fas fa-tachometer-alt"></i> Dashboard Overview</a></li>
+            <li><a href="#properties"><i class="fas fa-building"></i> My Properties</a></li>
+            <li><a href="#tenants"><i class="fas fa-users"></i> Tenants</a></li>
+            <li><a href="#payments"><i class="fas fa-wallet"></i> Payments</a></li>
+            <li><a href="#reports"><i class="fas fa-chart-pie"></i> Reports</a></li>
+            <li><a href="#settings"><i class="fas fa-cogs"></i> Settings</a></li>
+            <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </nav>
+</aside>
+
+<main class="dashboard-main-content">
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mb-4">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<section id="overview" class="dashboard-section active-section">
+    <h2>Dashboard Overview</h2>
+
+    <div class="dashboard-stats-grid">
+        <div class="stat-card">
+            <h3>Total Properties</h3>
+            <p class="stat-value">{{ total_properties }}</p>
+            <i class="fas fa-building stat-icon"></i>
+        </div>
+        <div class="stat-card">
+            <h3>Active Tenants</h3>
+            <p class="stat-value">{{ total_tenants }}</p>
+            <i class="fas fa-users stat-icon"></i>
+        </div>
+        <div class="stat-card">
+            <h3>Upcoming Payments</h3>
+            <p class="stat-value">Ksh {{ upcoming_payments }}</p>
+            <i class="fas fa-money-bill-wave stat-icon"></i>
+        </div>
+        <div class="stat-card">
+            <h3>Months Paid</h3>
+            <p class="stat-value">{{ months_paid }}</p>
+            <i class="fas fa-calendar-check stat-icon"></i>
+        </div>
+        <div class="stat-card">
+            <h3>Overdue Payments</h3>
+            <p class="stat-value stat-alert">Ksh {{ overdue_payments }}</p>
+            <i class="fas fa-exclamation-triangle stat-icon stat-alert"></i>
+        </div>
+    </div>
+
+    <div class="recent-activity-card">
+        <h3>Recent Activity</h3>
+        <ul>
+            {% for payment in recent_payments %}
+                <li>
+                    <i class="fas fa-check-circle"></i>
+                    Tenant {{ payment.tenant.name }} - {{ payment.tenant.property.name }}
+                    <span class="activity-date">{{ payment.due_date|date:"d M Y" }}</span>
+                </li>
+            {% empty %}
+                <li>No recent activity available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="recent-activity-card">
+        <h3>Complaints Summary</h3>
+        <div style="margin-bottom: 12px;">
+            <p>You have <strong>{{ open_complaints }}</strong> open complaints out of <strong>{{ total_complaints }}</strong> total complaints.</p>
+            {% if open_complaints > 0 %}
+                <p style="color: #dc2626; font-weight: 600;">⚠️ You have {{ open_complaints }} complaint(s) awaiting response.</p>
+            {% else %}
+                <p style="color: #059669;">✅ All complaints have been addressed.</p>
+            {% endif %}
+        </div>
+        <a href="{% url 'landlord_complaints' %}" class="btn btn-primary" style="display:inline-block;">
+            <i class="fas fa-comments"></i> View All Complaints
+        </a>
+    </div>
+</section>
+
+<section id="complaints" class="dashboard-section">
+    <!-- Complaints will be managed from landlord_complaints page -->
+</section>
+
+<section id="properties" class="dashboard-section">
+    <h2>My Properties</h2>
+    <a href="{% url 'add_property' %}" class="btn btn-primary add-new-btn">
+        <i class="fas fa-plus"></i> Add New Property
+    </a>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Property Name</th>
+                    <th>Address</th>
+                    <th>Units</th>
+                    <th>Occupied</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for property in properties %}
+                    <tr>
+                        <td>{{ property.name }}</td>
+                        <td>{{ property.address }}</td>
+                        <td>{{ property.total_units }}</td>
+                        <td>{{ property.occupied_tenants }}</td>
+                        <td>
+                            <a href="{% url 'edit_property' property.id %}" class="action-btn edit-btn"><i class="fas fa-edit"></i> Edit</a>
+                            <form method="POST" action="{% url 'delete_property' property.id %}" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn delete-btn"><i class="fas fa-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5">No properties added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section id="tenants" class="dashboard-section">
+    <h2>Tenants</h2>
+    <a href="{% url 'add_tenant' %}" class="btn btn-primary add-new-btn">
+        <i class="fas fa-user-plus"></i> Add New Tenant
+    </a>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Property</th>
+                    <th>Rent Due</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in tenant_items %}
+                    <tr>
+                        <td>{{ item.tenant.name }}</td>
+                        <td>{{ item.tenant.property.name }}</td>
+                        <td>Ksh {{ item.tenant.rent }}</td>
+                        <td>{% if item.due_date %}{{ item.due_date|date:"d M Y" }}{% else %}N/A{% endif %}</td>
+                        <td>
+                            {% if item.status == "paid" %}
+                                <span class="status-badge paid">Paid</span>
+                            {% elif item.status == "overdue" %}
+                                <span class="status-badge overdue">Overdue</span>
+                            {% elif item.status == "pending" %}
+                                <span class="status-badge pending">Pending</span>
+                            {% else %}
+                                <span class="status-badge">No Payments</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'edit_tenant' item.tenant.id %}" class="action-btn edit-btn"><i class="fas fa-edit"></i> Edit</a>
+                            <form method="POST" action="{% url 'remove_tenant' item.tenant.id %}" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="action-btn delete-btn"><i class="fas fa-trash"></i> Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6">No tenants linked yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section id="payments" class="dashboard-section">
+    <h2>Payments</h2>
+    <div class="payment-summary">
+        <div class="payment-card">
+            <h3>Rent Collected</h3>
+            <p class="payment-value">Ksh {{ total_collected }}</p>
+        </div>
+        <div class="payment-card">
+            <h3>Pending</h3>
+            <p class="payment-value">Ksh {{ upcoming_payments }}</p>
+        </div>
+        <div class="payment-card">
+            <h3>Overdue</h3>
+            <p class="payment-value stat-alert">Ksh {{ overdue_payments }}</p>
+        </div>
+    </div>
+</section>
+
+<section id="reports" class="dashboard-section">
+    <h2>Reports</h2>
+    <p>Review occupancy, tenant rent status, and payment performance for your portfolio.</p>
+    <div class="report-cards">
+        <div class="report-card">
+            <h4>Property Utilization</h4>
+            <p>{{ total_properties }} properties with {{ total_tenants }} tenants linked.</p>
+        </div>
+        <div class="report-card">
+            <h4>Collections</h4>
+            <p>Ksh {{ total_collected }} collected so far.</p>
+        </div>
+        <div class="report-card">
+            <h4>Outstanding</h4>
+            <p>Ksh {{ overdue_payments }} overdue.</p>
+        </div>
+    </div>
+    <button class="btn btn-primary"><i class="fas fa-chart-line"></i> Generate Report</button>
+</section>
+
+<section id="settings" class="dashboard-section">
+    <h2>Settings</h2>
+    <p>Update your profile and account settings here.</p>
+    <div class="settings-grid">
+        <div class="settings-card">
+            <h4>Account</h4>
+            <p>Name: {{ user.get_full_name|default:user.username }}</p>
+            <p>Email: {{ user.email }}</p>
+            <p>Phone: {{ user.phone|default:"Not set" }}</p>
+        </div>
+        <div class="settings-card">
+            <h4>Actions</h4>
+            <a href="{% url 'landlord_profile' %}" class="btn btn-secondary">Edit Profile</a>
+        </div>
+    </div>
+</section>
+</main>
+{% endblock %}

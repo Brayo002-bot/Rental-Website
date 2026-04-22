@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Features - MakaziPAY Kenya{% endblock %}
+
+{% block content %}
+<section class="features-hero">
+    <div class="container">
+        <h1>Discover MakaziPAY Kenya’s Powerful Features</h1>
+        <p>Streamline your rental journey with tools built for landlords and tenants.</p>
+    </div>
+</section>
+
+<section class="feature-detail-section light-bg">
+    <div class="container content-grid">
+        <div class="text-content">
+            <h2>For Landlords: Effortless Property Management</h2>
+            <p>MakaziPAY Kenya provides landlords with a suite of tools to manage properties and tenants with ease. From onboarding to reporting, we’ve got you covered.</p>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Tenant onboarding made simple.</li>
+                <li><i class="fas fa-check-circle"></i> Property overviews & occupancy tracking.</li>
+                <li><i class="fas fa-check-circle"></i> Real-time payment tracking.</li>
+                <li><i class="fas fa-check-circle"></i> Built-in tenant communication tools.</li>
+            </ul>
+            <a href="/dashboards/landlord/" class="btn btn-primary">Go to Landlord Dashboard</a>
+        </div>
+        <div class="image-content">
+            <img src="{% static 'landlord.png' %}" alt="Landlord Dashboard Screenshot">
+        </div>
+    </div>
+</section>
+
+<section class="feature-detail-section">
+    <div class="container content-grid reverse-grid">
+        <div class="image-content">
+            <img src="{% static 'tenant.png' %}" alt="Tenant Payment Screen">
+        </div>
+        <div class="text-content">
+            <h2>For Tenants: Simple & Secure Rent Payments</h2>
+            <p>Tenants enjoy an easy way to manage rent payments and stay on top of due dates. We make it transparent and stress-free.</p>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Online rent payments from anywhere.</li>
+                <li><i class="fas fa-check-circle"></i> Easy payment history lookup.</li>
+                <li><i class="fas fa-check-circle"></i> Upcoming payment reminders.</li>
+                <li><i class="fas fa-check-circle"></i> Document access (leases, invoices, etc.).</li>
+            </ul>
+            <a href="/dashboards/tenant/" class="btn btn-secondary">Go to Tenant Dashboard</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

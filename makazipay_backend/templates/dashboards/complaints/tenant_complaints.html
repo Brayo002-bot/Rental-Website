@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}My Complaints - MakaziPAY Kenya{% endblock %}
+
+{% block content %}
+<main class="dashboard-main-content">
+    <div class="dashboard-top-row" style="display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:20px; flex-wrap:wrap;">
+        <h2>My Complaints</h2>
+        <a href="{% url 'file_complaint' %}" class="btn btn-primary">File New Complaint</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} mb-4">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Stats Cards -->
+    <div class="dashboard-stats-grid">
+        <div class="stat-card">
+            <h3>Total Complaints</h3>
+            <p>{{ total_complaints }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Open</h3>
+            <p style="color:orange;">{{ open_complaints }}</p>
+        </div>
+        <div class="stat-card">
+            <h3>Resolved</h3>
+            <p style="color:green;">{{ resolved_complaints }}</p>
+        </div>
+    </div>
+
+    <!-- Complaints List -->
+    <section class="dashboard-section">
+        <h3>Complaints History</h3>
+        {% if complaints %}
+            <div style="overflow-x: auto;">
+                <table class="complaints-table" style="width:100%; border-collapse:collapse; margin-top:16px;">
+                    <thead style="background-color:#f3f4f6; border-bottom:2px solid #e5e7eb;">
+                        <tr>
+                            <th style="padding:12px; text-align:left; font-weight:600;">Title</th>
+                            <th style="padding:12px; text-align:left; font-weight:600;">Property</th>
+                            <th style="padding:12px; text-align:left; font-weight:600;">Priority</th>
+                            <th style="padding:12px; text-align:left; font-weight:600;">Status</th>
+                            <th style="padding:12px; text-align:left; font-weight:600;">Date Filed</th>
+                            <th style="padding:12px; text-align:center; font-weight:600;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for complaint in complaints %}
+                            <tr style="border-bottom:1px solid #e5e7eb; hover:background-color:#f9fafb;">
+                                <td style="padding:12px;">
+                                    <strong>{{ complaint.title|truncatewords:5 }}</strong>
+                                </td>
+                                <td style="padding:12px;">
+                                    {{ complaint.tenant.property.name }} - Unit {{ complaint.tenant.unit }}
+                                </td>
+                                <td style="padding:12px;">
+                                    <span style="
+                                        padding:4px 8px;
+                                        border-radius:4px;
+                                        font-size:12px;
+                                        font-weight:600;
+                                        background-color:{% if complaint.priority == 'urgent' %}#fee2e2{% elif complaint.priority == 'high' %}#fef3c7{% elif complaint.priority == 'medium' %}#dbeafe{% else %}#e0e7ff{% endif %};
+                                        color:{% if complaint.priority == 'urgent' %}#991b1b{% elif complaint.priority == 'high' %}#92400e{% elif complaint.priority == 'medium' %}#1e40af{% else %}#3730a3{% endif %};
+                                    ">
+                                        {{ complaint.get_priority_display }}
+                                    </span>
+                                </td>
+                                <td style="padding:12px;">
+                                    <span style="
+                                        padding:4px 8px;
+                                        border-radius:4px;
+                                        font-size:12px;
+                                        font-weight:600;
+                                        background-color:{% if complaint.status == 'resolved' or complaint.status == 'closed' %}#d1fae5{% elif complaint.status == 'in_progress' %}#fef3c7{% else %}#fed7aa{% endif %};
+                                        color:{% if complaint.status == 'resolved' or complaint.status == 'closed' %}#065f46{% elif complaint.status == 'in_progress' %}#92400e{% else %}#9a3412{% endif %};
+                                    ">
+                                        {{ complaint.get_status_display }}
+                                    </span>
+                                </td>
+                                <td style="padding:12px;">
+                                    {{ complaint.created_at|date:"d M Y" }}
+                                </td>
+                                <td style="padding:12px; text-align:center;">
+                                    <a href="{% url 'complaint_detail' complaint.id %}" class="btn btn-sm btn-primary" style="font-size:12px; padding:6px 12px;">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <p>You haven't filed any complaints yet. <a href="{% url 'file_complaint' %}">File a complaint</a></p>
+            </div>
+        {% endif %}
+    </section>
+</main>
+
+<style>
+    .complaints-table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+</style>
+{% endblock %}
