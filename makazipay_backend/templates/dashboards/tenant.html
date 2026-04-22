@@ -45,7 +45,12 @@
                     <div class="rent-cycle-card" style="border:1px solid #e2e8f0; border-radius:12px; padding:16px; background:#fff;">
                         <p class="text-sm text-gray-500 mb-2">{{ month.label }}</p>
                         <p class="font-semibold">Ksh {{ month.amount }}</p>
-                        <p class="mt-2" style="color:{% if month.status == 'Paid' %}green{% elif month.status == 'Overdue' %}red{% elif month.status == 'Pending' %}orange{% else %}gray{% endif %};">
+                        <p class="mt-2 
+                          {% if month.status == 'Paid' %}text-green-500
+                          {% elif month.status == 'Overdue' %}text-red-500
+                          {% elif month.status == 'Pending' %}text-orange-500
+                          {% else %}text-gray-500
+                          {% endif %}">
                             {{ month.status }}
                         </p>
                     </div>
