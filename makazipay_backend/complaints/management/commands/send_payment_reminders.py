@@ -61,13 +61,21 @@ class Command(BaseCommand):
             message = f"REMINDER: Your rent payment of Ksh {payment.amount} is due on {payment.due_date}. Pay now to avoid late fees."
 
         # TODO: Implement actual SMS/Email sending here
-        # from django.core.mail import send_mail
-        # send_mail(
-        #     f'Payment Reminder - {tenant.name}',
-        #     message,
-        #     'noreply@makazipay.com',
-        #     [tenant.user.email],
-        #     fail_silently=False,
-        # )
+        from django.core.mail import send_mail
+        try:
+            send_mail(
+                f'Payment Reminder - {tenant.name}',
+                message,
+                'noreply@makazipay.com',
+                [tenant.user.email],
+                fail_silently=False,
+            )
+            self.stdout.write(
+                self.style.SUCCESS(f'Email sent to {tenant.user.email} for {tenant.name}')
+            )
+        except Exception as e:
+            self.stdout.write(
+                self.style.ERROR(f'Failed to send email to {tenant.user.email}: {str(e)}')
+            )
 
-        print(f"Reminder sent to {tenant.name}: {message}")
+        # print(f"Reminder sent to {tenant.name}: {message}")

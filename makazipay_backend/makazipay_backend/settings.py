@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'users',
     'properties',
     'payments',
@@ -137,6 +138,18 @@ MPESA_CONSUMER_SECRET = 'your-consumer-secret'
 MPESA_SHORTCODE = '174379'
 MPESA_PASSKEY = 'your-passkey'
 MPESA_CALLBACK_URL = 'https://yourdomain.com/mpesa/callback/'
+
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'aruahbrian@gmail.com'
+EMAIL_HOST_PASSWORD = 'lgjigpikqigujbcf'  # Use environment variable in production!
+
+DEFAULT_FROM_EMAIL = 'MakaziPay <aruahbrian@gmail.com>'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

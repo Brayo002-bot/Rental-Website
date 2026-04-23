@@ -1,7 +1,6 @@
 from django.urls import path, include
 from django.shortcuts import redirect, render
 from users.views import (
-    landlord_dashboard,
     tenant_dashboard,
     tenant_profile,
     login_view,
@@ -16,6 +15,7 @@ from users.views import (
     landlord_profile,
     mpesa_pay,
 )
+from properties.views import landlord_dashboard
 
 def home_view(request):
     """
@@ -58,6 +58,9 @@ urlpatterns = [
 
     # PAYMENTS
     path("mpesa-pay/", mpesa_pay, name="mpesa_pay"),
+    
+    # PROPERTIES APP
+    path("properties/", include("properties.urls")),
     
     # COMPLAINTS
     path("complaints/", include("complaints.urls")),

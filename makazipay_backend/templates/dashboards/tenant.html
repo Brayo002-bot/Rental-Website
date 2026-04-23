@@ -2,6 +2,23 @@
 
 {% block title %}Tenant Dashboard - MakaziPAY Kenya{% endblock %}
 
+{% block body_class %}dashboard-body{% endblock %}
+
+{% block header %}
+<header class="tenant-header">
+    <div class="tenant-header-content">
+        <div class="logo">
+            <a href="/">MakaziPAY Kenya</a>
+        </div>
+        <div class="tenant-actions">
+            <a href="{% url 'logout' %}" class="btn btn-primary logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
 {% block content %}
 <main class="dashboard-main-content">
     {% if messages %}

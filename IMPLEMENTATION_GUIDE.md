@@ -12,8 +12,9 @@ This document describes the new features added to the MakaziPAY Rental System:
 
 ### Feature Description
 - Landlords can set due dates for rent payments (already in place with Payment model)
-- The system can automatically send reminders to tenants based on payment due dates
+- The system can automatically send email reminders to tenants based on payment due dates
 - Reminders track: when they were sent, how many times, and last send date
+- Supports both upcoming payment reminders and overdue payment notifications
 
 ### Database Fields Added
 - `payment_date` (DateTimeField): When the payment was actually made
@@ -21,13 +22,52 @@ This document describes the new features added to the MakaziPAY Rental System:
 - `reminder_count` (IntegerField): Number of reminders sent
 - `last_reminder_date` (DateTimeField): When the last reminder was sent
 
+### Email Configuration
+The system is configured to send emails using Django's email backend. For development, emails are printed to the console. For production, configure SMTP settings in `settings.py`:
+
+```python
+# Production email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your-app-password'
+DEFAULT_FROM_EMAIL = 'noreply@makazipay.com'
+```
+
 ### Management Command
-Run reminders with:
+Run reminders manually with:
 ```bash
 python manage.py send_payment_reminders --days-before=3
 ```
 
 This sends reminders 3 days before the due date, and again for overdue payments.
+
+### Automated Scheduling
+
+#### For Development/Windows:
+1. Create a Windows Task Scheduler task to run `automated_reminders.py` daily
+2. Or run the script manually when needed
+
+#### For Production/Linux:
+Set up a cron job to run the automated reminders script daily at 9 AM:
+```bash
+# Edit crontab
+crontab -e
+
+# Add this line (adjust path to your project)
+0 9 * * * /usr/bin/python3 /path/to/makazipay_backend/automated_reminders.py
+```
+
+#### Using the Automated Script:
+```bash
+# Run manually
+python automated_reminders.py
+
+# Or with full path
+/path/to/python /path/to/makazipay_backend/automated_reminders.py
+```
 
 ### Dashboard
 - Landlords can see overdue payments highlighted in red
