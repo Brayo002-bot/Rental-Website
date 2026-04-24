@@ -598,7 +598,8 @@ def tenant_dashboard(request):
         current_payment = Payment.objects.filter(
             tenant=tenant_apartment,
             due_date__year=today.year,
-            due_date__month=today.month
+            due_date__month=today.month,
+            paid=False
         ).first()
 
         apartment_rows.append({
@@ -670,6 +671,7 @@ def landlord_profile(request):
         last_name = request.POST.get("last_name", "").strip()
         email = request.POST.get("email", "").strip()
         phone = request.POST.get("phone", "").strip()
+        profile_picture = request.FILES.get("profile_picture")
 
         if not first_name or not email:
             messages.error(request, "First name and email are required.")
@@ -683,6 +685,17 @@ def landlord_profile(request):
         request.user.last_name = last_name
         request.user.email = email
         request.user.phone = phone
+        
+        # Handle profile picture upload
+        if profile_picture:
+            # Delete old profile picture if exists
+            if request.user.profile_picture:
+                try:
+                    request.user.profile_picture.delete()
+                except:
+                    pass
+            request.user.profile_picture = profile_picture
+        
         request.user.save()
 
         messages.success(request, "✅ Profile updated successfully.")
@@ -703,6 +716,7 @@ def tenant_profile(request):
         first_name = request.POST.get("first_name", "").strip()
         last_name = request.POST.get("last_name", "").strip()
         phone = request.POST.get("phone", "").strip()
+        profile_picture = request.FILES.get("profile_picture")
 
         if not first_name:
             messages.error(request, "First name is required.")
@@ -711,6 +725,17 @@ def tenant_profile(request):
         request.user.first_name = first_name
         request.user.last_name = last_name
         request.user.phone = phone
+        
+        # Handle profile picture upload
+        if profile_picture:
+            # Delete old profile picture if exists
+            if request.user.profile_picture:
+                try:
+                    request.user.profile_picture.delete()
+                except:
+                    pass
+            request.user.profile_picture = profile_picture
+        
         request.user.save()
 
         messages.success(request, "✅ Profile updated successfully.")
@@ -721,6 +746,23 @@ def tenant_profile(request):
 
 # =========================
 # MPESA HELPERS
+
+def is_mpesa_configured():
+    """Check if M-Pesa credentials are properly configured"""
+    consumer_key = getattr(settings, "MPESA_CONSUMER_KEY", "")
+    consumer_secret = getattr(settings, "MPESA_CONSUMER_SECRET", "")
+    shortcode = getattr(settings, "MPESA_SHORTCODE", "")
+    passkey = getattr(settings, "MPESA_PASSKEY", "")
+    
+    # Check if using placeholder values
+    if (consumer_key == "your-consumer-key" or 
+        consumer_secret == "your-consumer-secret" or
+        passkey == "your-passkey" or
+        not consumer_key or not consumer_secret or
+        not shortcode or not passkey):
+        return False
+    return True
+
 
 def get_mpesa_access_token():
     consumer_key = getattr(settings, "MPESA_CONSUMER_KEY", "")
@@ -814,6 +856,11 @@ def mpesa_pay(request):
 
     phone = request.POST.get("phone", "").strip() or request.user.phone
     amount = request.POST.get("amount", "").strip()
+    payment_id = request.POST.get("payment_id", "").strip()
+
+    # Debug: Log the received data
+    print(f"DEBUG mpesa_pay: phone={phone}, amount={amount}, payment_id={payment_id}")
+    print(f"DEBUG mpesa_pay: user={request.user}, user.phone={request.user.phone}")
 
     if not phone:
         messages.error(request, "Phone number is required for M-Pesa payment.")
@@ -834,11 +881,55 @@ def mpesa_pay(request):
     if phone.startswith("0"):
         phone = "254" + phone[1:]
 
+    # Check if M-Pesa is properly configured
+    if not is_mpesa_configured():
+        # Test mode: allow recording payment without actual M-Pesa call
+        test_mode = getattr(settings, "MPESA_TEST_MODE", False)
+        
+        print(f"DEBUG: is_mpesa_configured={is_mpesa_configured()}, test_mode={test_mode}, payment_id={payment_id}")
+        
+        if test_mode and payment_id:
+            try:
+                # Try to find the payment
+                payment = Payment.objects.get(id=payment_id, tenant__user=request.user)
+                print(f"DEBUG: Found payment: {payment}")
+                payment.paid = True
+                payment.payment_date = timezone.now()
+                payment.save()
+                messages.success(request, f"✅ Test payment recorded: Ksh {amount} paid successfully!")
+            except Payment.DoesNotExist:
+                print(f"DEBUG: Payment not found for id={payment_id}")
+                messages.error(request, "Payment record not found.")
+            except Exception as e:
+                print(f"DEBUG: Error: {e}")
+                messages.error(request, f"Error processing payment: {e}")
+        elif test_mode:
+            # Just show success message in test mode
+            messages.warning(request, f"⚠️ Test Mode: Payment of Ksh {amount} would be sent to {phone}. Configure real M-Pesa credentials for actual payments.")
+        else:
+            messages.error(request, "⚠️ M-Pesa payment is not configured. Please contact the administrator to set up M-Pesa STK Push credentials.")
+        return redirect("tenant_dashboard")
+
     try:
-        send_mpesa_stk_push(phone, amount_value)
-        messages.success(request, f"✅ M-Pesa STK Push sent to {phone}. Please enter your PIN on your phone.")
+        result = send_mpesa_stk_push(phone, amount_value)
+        
+        # Check the response from M-Pesa
+        if result.get("ResponseCode") == "0":
+            # Store the checkout request ID for callback tracking
+            checkout_id = result.get("CheckoutRequestID", "")
+            messages.success(request, f"✅ M-Pesa STK Push sent to {phone}. Please enter your PIN on your phone to complete payment.")
+        else:
+            error_message = result.get("errorMessage", "Unknown error from M-Pesa")
+            messages.error(request, f"M-Pesa error: {error_message}")
     except Exception as e:
-        messages.error(request, f"M-Pesa request failed: {e}")
+        # Provide more helpful error message
+        error_str = str(e)
+        if "authentication" in error_str.lower() or "unauthorized" in error_str.lower():
+            messages.error(request, "❌ M-Pesa authentication failed. Please contact the administrator.")
+        elif "connection" in error_str.lower() or "timeout" in error_str.lower():
+            messages.error(request, "❌ Could not connect to M-Pesa. Please try again later.")
+        else:
+            messages.error(request, f"❌ Payment request failed: {e}")
 
     return redirect("tenant_dashboard")
 

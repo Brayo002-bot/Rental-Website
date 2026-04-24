@@ -95,6 +95,7 @@
                                             {% csrf_token %}
                                             <input type="hidden" name="amount" value="{{ entry.payment.amount }}">
                                             <input type="hidden" name="phone" value="{{ user.phone }}">
+                                            <input type="hidden" name="payment_id" value="{{ entry.payment.id }}">
                                             <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition duration-200 w-full" {% if not user.phone %}disabled title="Please add phone number to your profile"{% endif %}>
                                                 💳 Pay with M-Pesa
                                             </button>
@@ -134,6 +135,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="amount" value="{{ item.next_due_payment.amount }}">
                                 <input type="hidden" name="phone" value="{{ user.phone }}">
+                                <input type="hidden" name="payment_id" value="{{ item.next_due_payment.id }}">
                                 <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-200" {% if not user.phone %}disabled title="Please add phone number to profile"{% endif %}>
                                     💳 Pay Rent
                                 </button>
@@ -159,6 +161,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="amount" value="{{ next_due_payment.amount }}">
                         <input type="hidden" name="phone" value="{{ user.phone }}">
+                        <input type="hidden" name="payment_id" value="{{ next_due_payment.id }}">
                         <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition duration-200" {% if not user.phone %}disabled title="Please add phone number to profile"{% endif %}>
                             💳 Pay Ksh {{ next_due_payment.amount }} via M-Pesa
                         </button>

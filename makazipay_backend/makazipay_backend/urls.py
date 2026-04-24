@@ -1,5 +1,7 @@
 from django.urls import path, include
 from django.shortcuts import redirect, render
+from django.conf import settings
+from django.conf.urls.static import static
 from users.views import (
     tenant_dashboard,
     tenant_profile,
@@ -65,3 +67,7 @@ urlpatterns = [
     # COMPLAINTS
     path("complaints/", include("complaints.urls")),
 ]
+
+# Serve media files in development
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
