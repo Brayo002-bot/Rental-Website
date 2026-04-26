@@ -145,16 +145,16 @@ MPESA_CALLBACK_URL = 'https://yourdomain.com/mpesa/callback/'
 MPESA_TEST_MODE = True  # Set to False in production
 
 # Email configuration
+from decouple import config
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = 'password'  # Use environment variable in production!
-
-DEFAULT_FROM_EMAIL = 'MakaziPay <aruahbrian@gmail.com>'
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
