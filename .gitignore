@@ -11,8 +11,8 @@ venv/
 .env
 
 # Django
-staticfiles/
-media/
+#staticfiles/
+#media/
 
 # Node.js
 node_modules/
