@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'users',
     'properties',
-    'payments',
     'complaints',
 ]
 
@@ -76,8 +75,7 @@ TEMPLATES = [
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    PROJECT_ROOT / 'frontend',
-    PROJECT_ROOT / 'images',
+    path for path in [PROJECT_ROOT / 'frontend', PROJECT_ROOT / 'images'] if path.exists()
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 

@@ -815,7 +815,7 @@ def send_mpesa_stk_push(phone, amount):
     )
 
     payload = {
-        "BusinessShortCode": "174379",
+        "BusinessShortCode": shortcode,
         "Password": password,
         "Timestamp": timestamp,
         "TransactionType": "CustomerPayBillOnline",
