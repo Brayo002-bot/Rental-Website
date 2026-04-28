@@ -72,6 +72,13 @@
 
         <section class="dashboard-section">
             <h3>Pay Rent</h3>
+            {% if not mpesa_enabled %}
+                {% if mpesa_test_mode %}
+                    <div class="alert alert-warning">⚠️ M-Pesa is running in Test Mode. Payments are recorded locally and no actual STK Push is sent.</div>
+                {% else %}
+                    <div class="alert alert-warning">⚠️ M-Pesa is not configured. Contact your administrator to enable STK Push for rent payments.</div>
+                {% endif %}
+            {% endif %}
             {% if current_month_payments %}
                 <div class="current-month-payments" style="display:grid; gap:16px; margin-top:16px;">
                     {% for entry in current_month_payments %}
@@ -91,6 +98,11 @@
                                 </div>
                                 <div style="min-width:220px;">
                                     {% if not entry.payment.paid %}
+                                        {% if entry.payment.checkout_request_id %}
+                                            <div class="alert alert-info mt-3">
+                                                ✅ STK Push sent. Please complete the payment on your phone, or try again if it does not arrive.
+                                            </div>
+                                        {% endif %}
                                         <form method="POST" action="{% url 'mpesa_pay' %}" class="flex flex-col gap-3">
                                             {% csrf_token %}
                                             <input type="hidden" name="amount" value="{{ entry.payment.amount }}">
@@ -167,6 +179,9 @@
                     <p><strong>Property:</strong> {{ next_due_payment.tenant.property.name }} (Unit {{ next_due_payment.tenant.unit }})</p>
                     <p><strong>Status:</strong> {% if next_due_payment.due_date < today %}<span style="color:red;">Overdue</span>{% else %}<span style="color:orange;">Pending</span>{% endif %}</p>
 
+                    {% if next_due_payment.checkout_request_id and not next_due_payment.paid %}
+                        <div class="alert alert-info mb-4">✅ STK Push sent for this invoice. Please complete payment on your phone.</div>
+                    {% endif %}
                     <form method="POST" action="{% url 'mpesa_pay' %}" class="space-y-4 max-w-xl mt-4">
                         {% csrf_token %}
                         <input type="hidden" name="amount" value="{{ next_due_payment.amount }}">

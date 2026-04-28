@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 from django.conf import settings
 
@@ -30,6 +32,8 @@ class Payment(models.Model):
     paid = models.BooleanField(default=False)
     due_date = models.DateField()
     payment_date = models.DateTimeField(null=True, blank=True)
+    checkout_request_id = models.CharField(max_length=255, blank=True, null=True)
+    mpesa_response = models.TextField(blank=True, null=True)
     reminder_sent = models.BooleanField(default=False)
     reminder_count = models.IntegerField(default=0)
     last_reminder_date = models.DateTimeField(null=True, blank=True)
@@ -40,6 +44,16 @@ class Payment(models.Model):
             models.Index(fields=['tenant', '-due_date']),
             models.Index(fields=['paid', 'due_date']),
         ]
+
+    @property
+    def status(self):
+        if self.paid:
+            return 'Paid'
+        if self.checkout_request_id:
+            return 'Pending STK Push'
+        if self.due_date < date.today():
+            return 'Overdue'
+        return 'Pending'
 
     def __str__(self):
         return f"{self.tenant.name} - Ksh {self.amount} due {self.due_date}"

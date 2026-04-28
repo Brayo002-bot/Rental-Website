@@ -527,7 +527,10 @@ def tenant_dashboard(request):
             "overdue_amount": 0,
             "latest_payment": None,
             "today": date.today(),
-            "message": "You haven't been linked to any apartment yet. Contact your landlord."
+            "message": "You haven't been linked to any apartment yet. Contact your landlord.",
+            "mpesa_enabled": is_mpesa_configured(),
+            "mpesa_test_mode": getattr(settings, "MPESA_TEST_MODE", False),
+            "has_phone": bool(request.user.phone),
         }
         return render(request, "dashboards/tenant.html", context)
 
@@ -653,6 +656,9 @@ def tenant_dashboard(request):
         "next_due_payment": next_due_payment,
         "rent_cycle": rent_cycle,
         "today": today,
+        "mpesa_enabled": is_mpesa_configured(),
+        "mpesa_test_mode": getattr(settings, "MPESA_TEST_MODE", False),
+        "has_phone": bool(request.user.phone),
     }
 
     return render(request, "dashboards/tenant.html", context)
@@ -915,11 +921,18 @@ def mpesa_pay(request):
         
         # Check the response from M-Pesa
         if result.get("ResponseCode") == "0":
-            # Store the checkout request ID for callback tracking
             checkout_id = result.get("CheckoutRequestID", "")
+            if payment_id:
+                try:
+                    payment = Payment.objects.get(id=payment_id, tenant__user=request.user)
+                    payment.checkout_request_id = checkout_id
+                    payment.mpesa_response = json.dumps(result)
+                    payment.save()
+                except Payment.DoesNotExist:
+                    messages.warning(request, "⚠️ M-Pesa STK Push sent, but invoice record was not found to attach the checkout request.")
             messages.success(request, f"✅ M-Pesa STK Push sent to {phone}. Please enter your PIN on your phone to complete payment.")
         else:
-            error_message = result.get("errorMessage", "Unknown error from M-Pesa")
+            error_message = result.get("errorMessage") or result.get("error", "Unknown error from M-Pesa")
             messages.error(request, f"M-Pesa error: {error_message}")
     except Exception as e:
         # Provide more helpful error message
